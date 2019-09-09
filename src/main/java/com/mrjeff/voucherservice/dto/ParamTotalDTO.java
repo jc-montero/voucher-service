@@ -3,6 +3,9 @@ package com.mrjeff.voucherservice.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -11,5 +14,7 @@ public class ParamTotalDTO {
     private final String voucher;
 
     @Getter
-    private final List<ProductDTO> products;
+    @Valid
+    @NotEmpty(message = "La lista de productos no puede ser vacía!")
+    private final List<@NotNull ProductDTO> products;
 }

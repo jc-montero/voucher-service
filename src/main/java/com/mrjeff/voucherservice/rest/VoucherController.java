@@ -1,16 +1,22 @@
 package com.mrjeff.voucherservice.rest;
 
-import com.mrjeff.voucherservice.ResponseVouchersDTO;
 import com.mrjeff.voucherservice.dto.ParamTotalDTO;
 import com.mrjeff.voucherservice.dto.ParamVouchersDTO;
 import com.mrjeff.voucherservice.dto.ResponseDTO;
 import com.mrjeff.voucherservice.dto.VoucherDTO;
 import com.mrjeff.voucherservice.exception.BusinessException;
+import com.mrjeff.voucherservice.exception.ValidationError;
 import com.mrjeff.voucherservice.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("vouchers-rest")
@@ -21,18 +27,14 @@ public class VoucherController {
 
     @PostMapping(value = "/total", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseDTO getTotalAmount(@RequestBody final ParamTotalDTO payload) {
+    public ResponseDTO getTotalAmount(@Valid @RequestBody final ParamTotalDTO payload) {
         ResponseDTO response;
 
-        if (isValid(payload)) {
-            try {
-                Float totalAmount = service.getTotalAmount(payload.getVoucher(), payload.getProducts());
-                response = ResponseDTO.builder().result(totalAmount).build();
-            } catch (BusinessException e) {
-                response = ResponseDTO.builder().error(e.getMessage()).build();
-            }
-        } else {
-            response = ResponseDTO.builder().error(BusinessException.ERROR_101_PRODUCTS_MANDATORY).build();
+        try {
+            Float totalAmount = service.getTotalAmount(payload.getVoucher(), payload.getProducts());
+            response = ResponseDTO.builder().result(totalAmount).build();
+        } catch (BusinessException e) {
+            response = ResponseDTO.builder().error(e.getMessage()).build();
         }
 
         return response;
@@ -40,25 +42,24 @@ public class VoucherController {
 
     @PostMapping(value = "/vouchers", produces = "application/json; charset=UTF-8")
     @ResponseBody
-    public ResponseVouchersDTO getVouchers(@RequestBody final ParamVouchersDTO payload) {
-        ResponseVouchersDTO response;
+    public List<VoucherDTO> getVouchers(@Valid @RequestBody final ParamVouchersDTO payload) {
+        boolean active = "true".equalsIgnoreCase(payload.getActive());
 
-        if (isValid(payload)) {
-            boolean active = "true".equalsIgnoreCase(payload.getActive());
-            List<VoucherDTO> vouchers = service.getVouchers(active, payload.getDiscount());
-            response = ResponseVouchersDTO.builder().result(vouchers).build();
-        } else {
-            response = ResponseVouchersDTO.builder().error(BusinessException.ERROR_200_INVALID_PARAMS).build();
-        }
-
-        return response;
+        return service.getVouchers(active, payload.getDiscount());
     }
 
-    private boolean isValid(ParamTotalDTO payload) {
-        return payload.getProducts() != null && payload.getProducts().size() > 0;
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ValidationError handleException(MethodArgumentNotValidException e) {
+        return createValidationError(e);
     }
 
-    private boolean isValid(ParamVouchersDTO payload) {
-        return payload.getActive() != null && payload.getDiscount() != null;
+    private ValidationError createValidationError(MethodArgumentNotValidException e) {
+        Errors errors = e.getBindingResult();
+        List<String> errorMessages = errors.getAllErrors().stream().map(ObjectError::getDefaultMessage)
+                .collect(Collectors.toList());
+
+        return ValidationError.builder().errorMessage("Errores de validación. " + errors.getErrorCount() + " error(es)")
+                .errors(errorMessages).build();
     }
 }
