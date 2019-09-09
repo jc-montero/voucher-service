@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-@Repository
 @Slf4j
 public class VoucherRepositoryImpl implements VoucherRepositoryCustom {
 
