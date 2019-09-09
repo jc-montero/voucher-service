@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class InputParamTotalDTO {
+public class ParamTotalDTO {
     @Getter
     private final String voucher;
 
