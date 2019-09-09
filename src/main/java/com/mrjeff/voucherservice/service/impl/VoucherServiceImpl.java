@@ -1,6 +1,7 @@
 package com.mrjeff.voucherservice.service.impl;
 
 import com.mrjeff.voucherservice.dto.ProductDTO;
+import com.mrjeff.voucherservice.dto.VoucherDTO;
 import com.mrjeff.voucherservice.exception.BusinessException;
 import com.mrjeff.voucherservice.model.Discount;
 import com.mrjeff.voucherservice.model.DiscountTypeEnum;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -47,5 +49,12 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         return total > 0f ? total : 0f;
+    }
+
+    @Override
+    public List<VoucherDTO> getVouchers(boolean active, String discountCode) {
+        List<Voucher> vouchers = repository.findAllByActiveAndDiscount(active, discountCode);
+
+        return vouchers.stream().map(Voucher::toDTO).collect(Collectors.toList());
     }
 }

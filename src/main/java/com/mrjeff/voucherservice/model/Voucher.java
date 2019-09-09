@@ -1,5 +1,6 @@
 package com.mrjeff.voucherservice.model;
 
+import com.mrjeff.voucherservice.dto.VoucherDTO;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,4 +19,9 @@ public class Voucher implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "discount", nullable = false)
     private Discount discount;
+
+    public VoucherDTO toDTO() {
+        return VoucherDTO.builder().code(code).active(active?"ACTIVO":"DESACTIVO").discountCode(discount.getCode())
+                .build();
+    }
 }
