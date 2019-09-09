@@ -1,6 +1,7 @@
 package com.mrjeff.voucherservice.service;
 
 import com.mrjeff.voucherservice.dto.ProductDTO;
+import com.mrjeff.voucherservice.dto.VoucherDTO;
 import com.mrjeff.voucherservice.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -71,5 +72,16 @@ public class VoucherServiceTest {
     public void testGetTotalAmountWithPercentageVoucher() throws BusinessException {
         Float result = service.getTotalAmount("CUPON-E", products);
         Assert.assertEquals(142.5f, result, 0.001f);
+    }
+
+    @Test
+    public void testGetVouchers() {
+        List<VoucherDTO> result = service.getVouchers(true, "GRATIS");
+        Assert.assertNotNull(result);
+        Assert.assertEquals(2, result.size());
+
+        result = service.getVouchers(false, "FIJO-5");
+        Assert.assertNotNull(result);
+        Assert.assertEquals(0, result.size());
     }
 }
