@@ -42,6 +42,9 @@ public class VoucherServiceTest {
     public void testGetTotalAmountWithoutVoucher() throws BusinessException {
         Float result = service.getTotalAmount(null, products);
         Assert.assertEquals(150f, result, 0.001f);
+
+        result = service.getTotalAmount("CUPON-Z", products);
+        Assert.assertEquals(150f, result, 0.001f);
     }
 
     @Test

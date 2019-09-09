@@ -23,12 +23,15 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public Float getTotalAmount(String code, List<ProductDTO> products) throws BusinessException {
-        Voucher voucher;
+        Voucher voucher = null;
 
         Float total = products.stream().map(ProductDTO::getPrice).reduce(0f, Float::sum);
 
         if (StringUtils.isNotBlank(code)) {
             voucher = repository.findByCode(code);
+        }
+
+        if (voucher != null) {
             Discount discount = voucher.getDiscount();
 
             if (voucher.isActive()) {
@@ -43,6 +46,6 @@ public class VoucherServiceImpl implements VoucherService {
             }
         }
 
-        return total;
+        return total > 0f ? total : 0f;
     }
 }
