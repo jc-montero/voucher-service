@@ -30,12 +30,12 @@ public class VoucherRepositoryTest {
     }
 
     @Test
-    public void findAllByActiveAndDiscount() {
-        List<Voucher> vouchers = repository.findAllByActiveAndDiscount(true, "GRATIS");
+    public void findByActiveAndDiscount() {
+        List<Voucher> vouchers = repository.findByActiveAndDiscount(true, "GRATIS");
         Assert.assertNotNull(vouchers);
         Assert.assertEquals(2, vouchers.size());
 
-        vouchers = repository.findAllByActiveAndDiscount(false, "FIJO-5");
+        vouchers = repository.findByActiveAndDiscount(false, "FIJO-5");
         Assert.assertNotNull(vouchers);
         Assert.assertEquals(0, vouchers.size());
     }

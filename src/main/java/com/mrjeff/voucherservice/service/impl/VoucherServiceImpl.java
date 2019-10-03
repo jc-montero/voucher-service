@@ -53,7 +53,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public List<VoucherDTO> getVouchers(boolean active, String discountCode) {
-        List<Voucher> vouchers = repository.findAllByActiveAndDiscount(active, discountCode);
+        List<Voucher> vouchers = repository.findByActiveAndDiscount(active, discountCode);
 
         return vouchers.stream().map(Voucher::toDTO).collect(Collectors.toList());
     }
